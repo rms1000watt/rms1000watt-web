@@ -1,21 +1,17 @@
-publishDir   = "../public"
-
-######################## default configuration ####################
-baseURL = "https://rms1000watt.com"
-languageCode = "en-us"
-title = "Liva | Personal blog template"
-theme = "liva-hugo"
-summaryLength = "10"
-paginate = 6
+baseURL         = "https://rms1000watt.com"
+title           = "rms1000watt"
+theme           = "liva-hugo"
+publishDir      = "../public"
+languageCode    = "en-us"
+summaryLength   = "10"
+paginate        = 6
 disqusShortname = ""
 
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+home = ["HTML", "RSS", "JSON"]
 
-############################# Plugins ##############################
 [params.plugins]
 
-  # CSS Plugins
   [[params.plugins.css]]
   URL = "plugins/bootstrap/bootstrap.min.css"
   [[params.plugins.css]]
@@ -24,8 +20,6 @@ disqusShortname = ""
   URL = "plugins/themify-icons/themify-icons.css"
   [[params.plugins.css]]
   URL = "plugins/venobox/venobox.css"
-
-  # JS Plugins
   [[params.plugins.js]]
   URL = "plugins/jQuery/jquery.min.js"
   [[params.plugins.js]]
@@ -41,96 +35,73 @@ disqusShortname = ""
   [[params.plugins.js]]
   URL = "plugins/search/search.js"
 
-
-############################## navigation ###############################
 [menu]
 
-  # main menu
   [[menu.main]]
-  name = "About"
-  URL = "about"
+  name   = "About"
+  URL    = "about"
   weight = 1
 
   [[menu.main]]
-  name = "Post"
-  URL = "blog"
+  name   = "Post"
+  URL    = "blog"
   weight = 2
 
   [[menu.main]]
-  name = "Contact"
-  URL = "contact"
+  name   = "Contact"
+  URL    = "contact"
   weight = 3
 
-  # footer menu
   [[menu.footer]]
-  name = "About"
-  URL = "about"
+  name   = "About"
+  URL    = "about"
   weight = 1
 
   [[menu.footer]]
-  name = "Post"
-  URL = "blog"
+  name   = "Post"
+  URL    = "blog"
   weight = 2
 
   [[menu.footer]]
-  name = "Contact"
-  URL = "contact"
+  name   = "Contact"
+  URL    = "contact"
   weight = 3
 
-
-#################### default parameters ################################
 [params]
-logo = "images/logo.png"
-home = "Home"
-# Meta data
+logo        = "images/logo.png"
+home        = "Home"
 description = "This is meta description"
-author = "Themefisher"
-# Google Analitycs
-googleAnalitycsID = "Your ID"
-# Contact Information
-mobile = "0124857985320"
-email = "demo@email.com"
-location = "Dhaka, Bangladedsh"
-# copyright
-copyright = "| copyright &copy; 2020 [Themefisher](https://themefisher.com) All Rights Reserved |"
+author      = "Ryan Smith"
+mobile      = "949-232-0216"
+email       = "rms1000watt@gmail.com"
+location    = "Southern California"
+copyright   = "| copyright &copy; 2020 Ryan Smith) All Rights Reserved |"
 
-  # Preloader
+googleAnalitycsID = "Your ID"
+
   [params.preloader]
-  enable = true
+  enable    = true
   preloader = "" # use .png , .svg or .gif format
 
-  # search
   [params.search]
   enable = true
 
-############################ news letter ########################
-[params.newsletter]
-enable = true
-title = "Join Our Newsletter"
-content = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero"
+  [params.newsletter]
+  enable = true
+  title = "Join Our Newsletter"
+  content = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero"
 
-############################# social site ########################
-[[params.social]]
-title = "facebook"
-icon = "ti-facebook" # themify icon : https://themify.me/themify-icons
-link = "#"
+  [[params.social]]
+  title = "twitter"
+  icon = "ti-twitter-alt" # themify icon : https://themify.me/themify-icons
+  link = "https://twitter.com/rms1000watt"
 
-[[params.social]]
-title = "twitter"
-icon = "ti-twitter-alt" # themify icon : https://themify.me/themify-icons
-link = "#"
+  [[params.social]]
+  title = "github"
+  icon = "ti-github"
+  link = "https://github.com/rms1000watt"
 
-[[params.social]]
-title = "instagram"
-icon = "ti-instagram" # themify icon : https://themify.me/themify-icons
-link = "#"
-
-[[params.social]]
-title = "github"
-icon = "ti-github" # themify icon : https://themify.me/themify-icons
-link = "#"
-
-[[params.social]]
-title = "linkedin"
-icon = "ti-linkedin" # themify icon : https://themify.me/themify-icons
-link = "#"
+  [[params.social]]
+  title = "linkedin"
+  icon = "ti-linkedin"
+  link = "https://linkedin.com/in/ryanmatthewsmith"
