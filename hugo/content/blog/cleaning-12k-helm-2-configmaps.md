@@ -1,28 +1,20 @@
 ---
-title: "Cleaning 12k Helm 2 Configmaps"
-date: 2020-07-27T12:51:00-07:00
 draft: false
-
-# post thumb
-image: "images/featured-post/garbage-collection.jpg"
-
-# meta description
+date: 2020-07-27T12:51:00-07:00
+title: "Cleaning 12k Helm 2 Configmaps"
 description: "this is meta description"
+image: "images/featured-post/garbage-collection.jpg"
+type: "featured"
 
-# taxonomies
 categories:
   - "DevOps"
 tags:
   - "Kubernetes"
   - "Helm"
   - "Garbage Collection"
-
-# post type
-type: "featured"
 ---
 
-### Intro
-
+---
 If you've ran helm in a development cluster for over a year and wasn't aware of `TILLER_HISTORY_MAX`, you're not alone 🤣🤣
 
 ### Observation
@@ -56,4 +48,6 @@ Yeah, we need to just migrate to Helm 3. Until then, we updated the `tiller-depl
 TILLER_HISTORY_MAX=10
 ```
 
-Which grants us automatic garbage collection
+Which grants us automatic garbage collection!
+
+---
