@@ -68,7 +68,7 @@ home = ["HTML", "RSS", "JSON"]
   weight = 3
 
 [params]
-logo        = "images/logo.png"
+logo        = "images/logo-35.png"
 home        = "Home"
 description = "This is meta description"
 author      = "Ryan Smith"
