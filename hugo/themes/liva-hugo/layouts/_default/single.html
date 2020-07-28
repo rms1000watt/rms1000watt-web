@@ -6,7 +6,7 @@
       <div class="col-lg-8 mx-auto">
         {{ range .Params.Categories }}
         <a href="{{ `categories/` | relLangURL }}{{ . | urlize | lower }}"
-          class="text-primary">{{ . | title | humanize }}</a>
+          class="text-primary">{{ . }}</a>
         {{ end }}
         <h2>{{ .Title | markdownify }}</h2>
         <div class="mb-3 post-meta">

@@ -6,7 +6,7 @@
         <div class="card-body px-0">
         {{ range .Params.Categories }}
         <a href="{{ `categories/` | relLangURL }}{{ . | urlize | lower }}"
-            class="text-primary">{{ . | title | humanize }}</a>
+            class="text-primary">{{ . }}</a>
         {{ end }}
         <a href="{{ .Permalink }}" class="h5 d-block my-3">{{ .Title | markdownify }}</a>
         <div class="mb-3 post-meta">
