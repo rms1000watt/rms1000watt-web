@@ -1,7 +1,7 @@
 publishDir   = "../public"
 
 ######################## default configuration ####################
-baseURL = "https://examplesite.com"
+baseURL = "https://rms1000watt.com"
 languageCode = "en-us"
 title = "Liva | Personal blog template"
 theme = "liva-hugo"
