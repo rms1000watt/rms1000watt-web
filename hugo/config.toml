@@ -6,6 +6,7 @@ languageCode    = "en-us"
 summaryLength   = "10"
 paginate        = 6
 disqusShortname = ""
+pygmentsUseClasses = true
 
 [outputs]
 home = ["HTML", "RSS", "JSON"]
@@ -87,7 +88,8 @@ googleAnalitycsID = "Your ID"
   enable = true
 
   [params.newsletter]
-  enable = true
+  # TODO: enable true later
+  enable = false
   title = "Stay in Touch"
   content = "If you'd like to stay up to date with new posts here, please share your email address to recieve updates on new content!"
 
