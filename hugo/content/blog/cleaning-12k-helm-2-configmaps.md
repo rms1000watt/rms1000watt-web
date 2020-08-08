@@ -79,4 +79,10 @@ TILLER_HISTORY_MAX=10
 
 Which grants us automatic garbage collection!
 
+### Contact & Hiring
+
+If you've enjoyed reading this, please reach out; I'd love to hear what you're working on.
+
+[_Please checkout Calm's career page for all available job openings_](https://boards.greenhouse.io/calm)
+
 ---
