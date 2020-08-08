@@ -30,7 +30,7 @@ Last week, everything was running smoothly until we started noticing failing dep
 
 When we scanned the CI/CD logs, we observed Helmfile failing deployments due to reaching timeouts. However, we realized this wasn't because the application deployed into a broken state. We were able to deduce the new version of the application never went out in the first place.
 
-Digging deeper.. we checked Tiller logs and noticed error logs mentioning timeouts of `GET` & `POST` to the `api/v1/namespaces/kube-system/configmaps` endpoint:
+Digging deeper.. we checked Tiller logs and noticed errors mentioning timeouts of the `configmaps` endpoint of the k8s api server:
 
 ```bash
 Error: Get https://172.20.0.1:443/api/v1/namespaces/kube-system/configmaps?labelSelector=OWNER%!D(MISSING)TILLER: read tcp 10.1.123.123:48172->172.20.0.1:443: read: connection timed out
