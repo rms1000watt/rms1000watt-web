@@ -26,7 +26,9 @@ Here's a quick post about a Helm 2 issue we ran into with our development k8s cl
 
 ### 'Twas a Normal Day Until..
 
-Last week, everything was running smoothly until we started noticing failing deployments and blocked developers. The initial obsevation in the logs was Helmfile hitting deployment timeouts and rolling back.
+Last week, everything was running smoothly until we started noticing failing deployments and blocked developers.
+
+When we scanned the CI/CD logs, we observed Helmfile failing deployments due to reaching timeouts. However, this wasn't because the application deployed into a broken state. We were able to deduce the new version of the application never went out in the first place.
 
 Digging deeper.. we checked Tiller logs and noticed error logs mentioning timeouts of `GET` & `POST` to the `api/v1/namespaces/kube-system/configmaps` endpoint:
 
