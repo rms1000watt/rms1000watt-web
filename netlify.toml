@@ -1,3 +1,15 @@
 [build]
-  publish = "/"
   command = ""
+  publish = "."
+
+[context.production]
+  command = ""
+  publish = "."
+
+[context.deploy-preview]
+  command = ""
+  publish = "."
+
+[context.branch-deploy]
+  command = ""
+  publish = "."
