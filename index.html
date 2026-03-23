@@ -100,21 +100,18 @@
 
     .site-list {
       list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
     }
 
     .site-link {
-      padding: 8px 12px;
-      background: linear-gradient(180deg, #4169e1 0%, #1e3a8a 100%);
-      color: #fff;
+      color: #00ffff;
       text-decoration: none;
-      font-size: 0.45rem;
-      border: 3px solid;
-      border-color: #6b8dd6 #1e3a8a #1e3a8a #6b8dd6;
-      box-shadow: 2px 2px 0 #000;
+      font-size: 0.5rem;
+      padding: 4px 0;
+      display: block;
+    }
+
+    .site-link:hover {
+      color: #ffd700;
     }
 
     .poly-1, .poly-2, .poly-3, .poly-4 {
@@ -178,15 +175,13 @@
       </div>
     </section>
 
-    <h2 class="section-title">★ SITE MAP ★</h2>
+    <h2 class="section-title">SITE MAP</h2>
 
-    <section class="sitemap box-3d-inverted">
-      <ul class="site-list">
-        <li><a href="./hello-world-tigerbeetle/" class="site-link">HELLO-WORLD-TIGERBEETLE/</a></li>
-        <li><a href="./hello-world-pixijs/" class="site-link">HELLO-WORLD-PIXIS/</a></li>
-        <li><a href="./hello-world-stategraph/" class="site-link">HELLO-WORLD-STATEGRAPH/</a></li>
-      </ul>
-    </section>
+    <ul class="site-list box-3d-inverted">
+      <li><a href="./hello-world-tigerbeetle/" class="site-link">hello-world-tigerbeetle/</a></li>
+      <li><a href="./hello-world-pixijs/" class="site-link">hello-world-pixijs/</a></li>
+      <li><a href="./hello-world-stategraph/" class="site-link">hello-world-stategraph/</a></li>
+    </ul>
   </div>
 </body>
 </html>
