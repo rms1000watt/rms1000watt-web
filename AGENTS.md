@@ -13,6 +13,24 @@ rms1000watt-web/
 ├── index.html              # Root index page
 ├── netlify.toml            # Netlify configuration
 ├── archive/                # Archived content
+├── exercise/              # Exercise tools
+│   └── workout-schedule/
+│       └── index.html
+├── friends/               # Friend-related pages
+│   └── grand/
+│       └── index.html
+└── games/                 # Browser games
+    ├── animal-empire/
+    │   └── index.html
+    ├── ball-drop/
+    │   └── index.html
+    └── elastomania/
+        └── index.html
+```
+rms1000watt-web/
+├── index.html              # Root index page
+├── netlify.toml            # Netlify configuration
+├── archive/                # Archived content
 │   └── content/
 │       └── blog/           # Old blog posts
 ├── exercise/               # Exercise tools
