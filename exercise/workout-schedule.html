@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Workout Schedule</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .back {
+      font-size: 0.9rem;
+      color: #666;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 32px;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    .day {
+      margin-bottom: 32px;
+    }
+
+    .day-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .day h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #1a1a1a;
+    }
+
+    .day ul {
+      list-style: none;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .day li {
+      padding: 4px 0;
+    }
+
+    .day li::before {
+      content: "•";
+      margin-right: 8px;
+      color: #999;
+    }
+
+    .note {
+      margin-top: 40px;
+      padding: 16px;
+      background: #f5f5f5;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .note strong {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <a href="../" class="back">← Back</a>
+
+  <h1>Workout Schedule</h1>
+  <p class="subtitle">5-Day Vigorous Training Plan</p>
+
+  <div class="day">
+    <div class="day-title">Monday</div>
+    <h2>Push Day (Chest, Shoulders, Triceps)</h2>
+    <ul>
+      <li>Bench Press - 4 sets x 6-8 reps</li>
+      <li>Incline Dumbbell Press - 3 sets x 8-10 reps</li>
+      <li>Overhead Press - 4 sets x 6-8 reps</li>
+      <li>Lateral Raises - 3 sets x 12-15 reps</li>
+      <li>Tricep Dips - 3 sets x 10-12 reps</li>
+      <li>Tricep Pushdown - 3 sets x 12-15 reps</li>
+    </ul>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Tuesday</div>
+    <h2>Pull Day (Back, Biceps)</h2>
+    <ul>
+      <li>Deadlifts - 4 sets x 5-6 reps</li>
+      <li>Pull-Ups / Lat Pulldown - 4 sets x 8-10 reps</li>
+      <li>Barbell Rows - 3 sets x 8-10 reps</li>
+      <li>Seated Cable Rows - 3 sets x 10-12 reps</li>
+      <li>Face Pulls - 3 sets x 15 reps</li>
+      <li>Barbell Curls - 3 sets x 10-12 reps</li>
+      <li>Hammer Curls - 3 sets x 12 reps</li>
+    </ul>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Wednesday</div>
+    <h2>Leg Day (Quads, Hamstrings, Calves)</h2>
+    <ul>
+      <li>Squats - 4 sets x 6-8 reps</li>
+      <li>Romanian Deadlifts - 3 sets x 8-10 reps</li>
+      <li>Leg Press - 3 sets x 10-12 reps</li>
+      <li>Leg Curls - 3 sets x 10-12 reps</li>
+      <li>Leg Extensions - 3 sets x 12-15 reps</li>
+      <li>Calf Raises - 4 sets x 15-20 reps</li>
+    </ul>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Thursday</div>
+    <h2>Upper Body (Compound Focus)</h2>
+    <ul>
+      <li>Bench Press - 4 sets x 5 reps</li>
+      <li>Weighted Pull-Ups - 4 sets x 6-8 reps</li>
+      <li>Overhead Press - 3 sets x 8 reps</li>
+      <li>Barbell Rows - 3 sets x 8 reps</li>
+      <li>Dumbbell Incline Press - 3 sets x 10 reps</li>
+      <li>Farmer Walks - 3 sets x 40 yards</li>
+    </ul>
+  </div>
+
+  <div class="day">
+    <div class="day-title">Friday</div>
+    <h2>Lower Body + Conditioning</h2>
+    <ul>
+      <li>Front Squats - 4 sets x 6-8 reps</li>
+      <li>Bulgarian Split Squats - 3 sets x 10 reps each leg</li>
+      <li>Hip Thrusts - 3 sets x 12 reps</li>
+      <li>Box Jumps - 3 sets x 10 reps</li>
+      <li>Kettlebell Swings - 3 sets x 15 reps</li>
+      <li>Sled Push / Prowler - 3 sets x 40 yards</li>
+    </ul>
+  </div>
+
+  <div class="note">
+    <strong>Notes:</strong> Rest 90-120 seconds between compound lifts, 60 seconds on isolation. Warm up 10 minutes before each session. Get 7-8 hours of sleep. Adjust weights to maintain rep ranges as you progress.
+  </div>
+</body>
+</html>
