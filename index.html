@@ -12,6 +12,16 @@
     body {
       font-family: 'Press Start 2P', monospace;
       background: #87ceeb;
+      transition: background 0.3s;
+    }
+
+    body.kawaii {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 50%, #fff0f5 100%);
+    }
+
+    body.kawaii * {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
     }
 
     .container {
@@ -27,6 +37,14 @@
       box-shadow: 4px 4px 0 #404040;
       padding: 15px;
       margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+
+    body.kawaii .box-3d {
+      background: #fff;
+      border: 4px solid #ff69b4;
+      box-shadow: 6px 6px 0 #ffb6c1;
+      border-radius: 20px;
     }
 
     .box-3d-inverted {
@@ -34,11 +52,16 @@
       border: 3px solid;
       border-color: #808080 #fff #fff #808080;
       padding: 15px;
+      transition: all 0.3s;
     }
 
-    .hero {
-      text-align: center;
+    body.kawaii .box-3d-inverted {
+      background: #fff0f5;
+      border: 4px solid #ff69b4;
+      border-radius: 15px;
     }
+
+    .hero { text-align: center; }
 
     .title {
       font-size: 1.2rem;
@@ -46,6 +69,13 @@
       text-shadow: 2px 2px 0 #ff8c00, -1px -1px 0 #000;
       margin-bottom: 10px;
       line-height: 1.4;
+      transition: all 0.3s;
+    }
+
+    body.kawaii .title {
+      font-size: 1.5rem;
+      color: #ff69b4;
+      text-shadow: 3px 3px 0 #ffb6c1, -1px -1px 0 #fff;
     }
 
     .profile-image {
@@ -55,6 +85,13 @@
       display: inline-block;
       image-rendering: pixelated;
       margin-bottom: 10px;
+      transition: all 0.3s;
+    }
+
+    body.kawaii .profile-image {
+      border-radius: 50%;
+      border: 5px solid #ff69b4;
+      box-shadow: 0 0 20px #ffb6c1;
     }
 
     .subtitle {
@@ -62,6 +99,13 @@
       color: #00ff00;
       text-shadow: 1px 1px 0 #000;
       margin-bottom: 10px;
+      transition: all 0.3s;
+    }
+
+    body.kawaii .subtitle {
+      font-size: 0.9rem;
+      color: #ff69b4;
+      text-shadow: 2px 2px 0 #fff;
     }
 
     .bio {
@@ -70,6 +114,13 @@
       text-shadow: 1px 1px 0 #000;
       line-height: 1.8;
       margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+
+    body.kawaii .bio {
+      font-size: 1rem;
+      color: #d87093;
+      text-shadow: 1px 1px 0 #fff;
     }
 
     .social-row {
@@ -88,6 +139,38 @@
       border: 3px solid;
       border-color: #ff8080 #800000 #800000 #ff8080;
       box-shadow: 2px 2px 0 #800000;
+      transition: all 0.3s;
+    }
+
+    body.kawaii .social-btn {
+      background: linear-gradient(180deg, #ff69b4 0%, #ff1493 100%);
+      border-color: #ffb6c1 #c71585 #c71585 #ffb6c1;
+      box-shadow: 3px 3px 0 #ff69b4;
+      border-radius: 20px;
+    }
+
+    .theme-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      background: #ffd700;
+      color: #000;
+      border: 3px solid;
+      border-color: #ffec8b #daa520 #daa520 #ffec8b;
+      box-shadow: 2px 2px 0 #000;
+      font-size: 0.5rem;
+      cursor: pointer;
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+
+    body.kawaii .theme-btn {
+      background: linear-gradient(180deg, #ff69b4 0%, #ff1493 100%);
+      color: #fff;
+      border-color: #ffb6c1 #c71585 #c71585 #ffb6c1;
+      border-radius: 15px;
+      box-shadow: 3px 3px 0 #ffb6c1;
     }
 
     .section-title {
@@ -96,11 +179,16 @@
       text-shadow: 2px 2px 0 #008b8b;
       text-align: center;
       margin: 15px 0 10px;
+      transition: all 0.3s;
     }
 
-    .site-list {
-      list-style: none;
+    body.kawaii .section-title {
+      font-size: 1rem;
+      color: #ff69b4;
+      text-shadow: 2px 2px 0 #ffb6c1;
     }
+
+    .site-list { list-style: none; }
 
     .site-link {
       color: #00ffff;
@@ -108,11 +196,17 @@
       font-size: 0.5rem;
       padding: 4px 0;
       display: block;
+      transition: all 0.3s;
     }
 
-    .site-link:hover {
-      color: #ffd700;
+    .site-link:hover { color: #ffd700; }
+
+    body.kawaii .site-link {
+      color: #ff69b4;
+      font-size: 0.9rem;
     }
+
+    body.kawaii .site-link:hover { color: #ff1493; }
 
     .poly-1, .poly-2, .poly-3, .poly-4 {
       display: none;
@@ -122,10 +216,37 @@
       font-size: 1rem;
       color: #ff0000;
       text-shadow: 1px 1px 0 #800000;
+      transition: all 0.3s;
     }
 
-    .health-bar {
-      margin-top: 10px;
+    body.kawaii .heart {
+      color: #ff69b4;
+      text-shadow: 2px 2px 0 #ffb6c1;
+    }
+
+    .health-bar { margin-top: 10px; }
+
+    body.kawaii .kawaii-deco {
+      display: block;
+      position: fixed;
+      font-size: 2rem;
+      opacity: 0.3;
+      z-index: -1;
+      animation: bounce 1s infinite;
+    }
+
+    body.kawaii .kawaii-deco.star1 { top: 10%; left: 5%; content: "★"; }
+    body.kawaii .kawaii-deco.heart1 { top: 30%; right: 10%; }
+    body.kawaii .kawaii-deco.star2 { bottom: 20%; left: 15%; }
+    body.kawaii .kawaii-deco.heart2 { bottom: 10%; right: 5%; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    body.kawaii .kawaii-deco {
+      display: block;
     }
 
     @media (min-width: 600px) {
@@ -134,7 +255,7 @@
       .subtitle { font-size: 0.7rem; }
       .bio { font-size: 0.55rem; }
       .social-btn { padding: 12px 20px; font-size: 0.6rem; }
-      .site-link { padding: 12px 18px; font-size: 0.55rem; }
+      .site-link { font-size: 0.55rem; }
       .box-3d { padding: 30px; margin-bottom: 20px; }
       .box-3d-inverted { padding: 20px; }
       .section-title { font-size: 0.9rem; margin: 20px 0 15px; }
@@ -154,10 +275,11 @@
   </style>
 </head>
 <body>
-  <div class="poly-1"></div>
-  <div class="poly-2"></div>
-  <div class="poly-3"></div>
-  <div class="poly-4"></div>
+  <button class="theme-btn" onclick="toggleTheme()">THEME</button>
+  <span class="kawaii-deco star1">☆</span>
+  <span class="kawaii-deco heart1">♡</span>
+  <span class="kawaii-deco star2">✿</span>
+  <span class="kawaii-deco heart2">♪</span>
 
   <div class="container">
     <section class="hero box-3d">
@@ -183,5 +305,11 @@
       <li><a href="./hello-world-stategraph/" class="site-link">hello-world-stategraph/</a></li>
     </ul>
   </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('kawaii');
+    }
+  </script>
 </body>
 </html>
