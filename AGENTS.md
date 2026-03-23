@@ -27,6 +27,8 @@ rms1000watt-web/
     └── elastomania/
         └── index.html
 ```
+
+Subdirectories can be added as needed. Each new subdirectory should contain its own `index.html`.
 rms1000watt-web/
 ├── index.html              # Root index page
 ├── netlify.toml            # Netlify configuration
