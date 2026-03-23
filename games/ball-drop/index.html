@@ -65,21 +65,6 @@
       transition: transform 0.1s, box-shadow 0.1s;
     }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(233,69,96,0.4); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #e94560;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 0.9rem;
-    }
-    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
@@ -106,10 +91,8 @@
     <div>Coins: <span id="coins">0</span></div>
   </div>
   <div class="upgrades">
-    <button class="btn" id="upgradeDurability" onclick="upgradeDurability()">+1 Durability (10)</button>
     <button class="btn" id="resetBtn" onclick="manualReset()">Reset</button>
   </div>
-  <div class="toast" id="toast"></div>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
@@ -147,7 +130,7 @@
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) return JSON.parse(saved);
       } catch (e) {}
-      return { coins: 0, maxDurability: 1, bestDepth: 0, totalTime: 0 };
+      return { coins: 0, maxDurability: 1, bestDepth: 0 };
     }
     
     function saveState() {
@@ -155,15 +138,11 @@
     }
     
     function updateDisplay() {
-      document.getElementById('timer').textContent = formatTime((state.totalTime || 0) + Math.floor((Date.now() - startTime) / 1000));
+      document.getElementById('timer').textContent = formatTime(Math.floor((Date.now() - startTime) / 1000));
       document.getElementById('depth').textContent = Math.floor(score);
       document.getElementById('best').textContent = Math.floor(state.bestDepth);
       document.getElementById('durability').textContent = currentDurability + '/' + state.maxDurability;
       document.getElementById('coins').textContent = formatNumber(state.coins);
-      
-      const btn = document.getElementById('upgradeDurability');
-      btn.textContent = `+1 Durability (${getUpgradeCost()})`;
-      btn.disabled = state.coins < getUpgradeCost();
     }
     
     function formatNumber(n) {
@@ -172,28 +151,6 @@
       if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
       if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
       return Math.floor(n).toString();
-    }
-    
-    function getUpgradeCost() {
-      return 10 + (state.maxDurability - 1) * 10;
-    }
-    
-    function upgradeDurability() {
-      const cost = getUpgradeCost();
-      if (state.coins >= cost) {
-        state.coins -= cost;
-        state.maxDurability++;
-        saveState();
-        updateDisplay();
-        showToast(`Max Durability: ${state.maxDurability}`);
-      }
-    }
-    
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
     }
     
     function createStick(y) {
@@ -220,30 +177,15 @@
       gameRunning = true;
     }
     
-    function resetGame() {
-      if (score > state.bestDepth) {
-        state.bestDepth = score;
-        showToast(`New Best: ${Math.floor(state.bestDepth)}!`);
-      }
-      
-      state.coins += Math.floor(score / 10);
-      saveState();
-      
-      initGame();
-    }
-    
     function manualReset() {
-      state.totalTime += Math.floor((Date.now() - startTime) / 1000);
-      saveState();
-      
       if (score > state.bestDepth) {
         state.bestDepth = score;
-        showToast(`New Best: ${Math.floor(state.bestDepth)}!`);
       }
       
       state.coins += Math.floor(score / 10);
       saveState();
       
+      startTime = Date.now();
       initGame();
     }
     
@@ -311,10 +253,9 @@
           if (currentDurability <= 0) {
             gameRunning = false;
             setTimeout(() => {
-              state.totalTime += Math.floor((Date.now() - startTime) / 1000);
               state.maxDurability++;
               saveState();
-              resetGame();
+              manualReset();
             }, 500);
           }
           
