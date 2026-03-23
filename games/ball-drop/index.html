@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ball Drop</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 10px;
+    }
+    h1 { color: #fff; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+    .stat {
+      color: #e94560;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .stat-label { color: #888; font-size: 0.7rem; display: block; }
+    #gameCanvas {
+      border: 3px solid #e94560;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(233,69,96,0.3);
+    }
+    .info {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 15px;
+      color: #888;
+      font-size: 0.8rem;
+    }
+    .upgrades {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(233,69,96,0.4); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #e94560;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.9rem;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Ball Drop</h1>
+    <div class="stats">
+      <div>
+        <span class="stat-label">DEPTH</span>
+        <span class="stat" id="depth">0</span>
+      </div>
+      <div>
+        <span class="stat-label">BEST</span>
+        <span class="stat" id="best">0</span>
+      </div>
+    </div>
+  </div>
+  <canvas id="gameCanvas" width="375" height="600"></canvas>
+  <div class="info">
+    <div>Durability: <span id="durability">1</span></div>
+    <div>Coins: <span id="coins">0</span></div>
+  </div>
+  <div class="upgrades">
+    <button class="btn" id="upgradeDurability" onclick="upgradeDurability()">+1 Durability (10)</button>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const STORAGE_KEY = 'ball_drop_save';
+    
+    const CANVAS_WIDTH = canvas.width;
+    const CANVAS_HEIGHT = canvas.height;
+    const STICK_SPACING = 120;
+    const STICK_HEIGHT = 8;
+    const STICK_WIDTH_MIN = 60;
+    const STICK_WIDTH_MAX = 120;
+    const BALL_RADIUS = 12;
+    const GRAVITY = 0.25;
+    
+    let state = loadState();
+    let ballY = 100;
+    let ballVelocityY = 0;
+    let sticks = [];
+    let gameRunning = true;
+    let currentDurability;
+    let lastStickY = CANVAS_HEIGHT + 100;
+    let breakEffect = null;
+    let highestDepth = 0;
+    
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return { coins: 0, maxDurability: 1, bestDepth: 0 };
+    }
+    
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    
+    function updateDisplay() {
+      document.getElementById('depth').textContent = Math.floor(highestDepth);
+      document.getElementById('best').textContent = Math.floor(state.bestDepth);
+      document.getElementById('durability').textContent = currentDurability + '/' + state.maxDurability;
+      document.getElementById('coins').textContent = formatNumber(state.coins);
+      
+      const btn = document.getElementById('upgradeDurability');
+      btn.textContent = `+1 Durability (${getUpgradeCost()})`;
+      btn.disabled = state.coins < getUpgradeCost();
+    }
+    
+    function formatNumber(n) {
+      if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+      if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
+      return Math.floor(n).toString();
+    }
+    
+    function getUpgradeCost() {
+      return 10 * Math.pow(2, state.maxDurability - 1);
+    }
+    
+    function upgradeDurability() {
+      const cost = getUpgradeCost();
+      if (state.coins >= cost) {
+        state.coins -= cost;
+        state.maxDurability++;
+        saveState();
+        updateDisplay();
+        showToast(`Max Durability: ${state.maxDurability}`);
+      }
+    }
+    
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    function createStick(y) {
+      return {
+        y: y,
+        x: Math.random() * (CANVAS_WIDTH - STICK_WIDTH_MAX - 40) + 20,
+        width: STICK_WIDTH_MIN + Math.random() * (STICK_WIDTH_MAX - STICK_WIDTH_MIN),
+        broken: false
+      };
+    }
+    
+    function initGame() {
+      ballY = 150;
+      ballVelocityY = 0;
+      sticks = [];
+      lastStickY = CANVAS_HEIGHT + 50;
+      breakEffect = null;
+      highestDepth = 0;
+      currentDurability = state.maxDurability;
+      
+      for (let i = 0; i < 8; i++) {
+        sticks.push(createStick(CANVAS_HEIGHT - 100 - i * STICK_SPACING));
+      }
+      lastStickY = CANVAS_HEIGHT - 100 - 7 * STICK_SPACING;
+      
+      gameRunning = true;
+    }
+    
+    function resetBall() {
+      ballY = 150;
+      ballVelocityY = 0;
+      
+      if (highestDepth > state.bestDepth) {
+        state.bestDepth = highestDepth;
+        showToast(`New Best: ${Math.floor(state.bestDepth)}!`);
+      }
+      
+      state.coins += Math.floor(highestDepth / 10);
+      saveState();
+      
+      showToast(`Reset! +${Math.floor(highestDepth / 10)} coins`);
+    }
+    
+    function drawBall(y) {
+      ctx.beginPath();
+      ctx.arc(CANVAS_WIDTH / 2, y, BALL_RADIUS, 0, Math.PI * 2);
+      const gradient = ctx.createRadialGradient(CANVAS_WIDTH / 2 - 4, y - 4, 0, CANVAS_WIDTH / 2, y, BALL_RADIUS);
+      gradient.addColorStop(0, '#ff6b6b');
+      gradient.addColorStop(1, '#c73e54');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    
+    function drawStick(stick) {
+      if (stick.broken) {
+        ctx.globalAlpha = 0.3;
+      }
+      
+      const gradient = ctx.createLinearGradient(stick.x, stick.y, stick.x + stick.width, stick.y);
+      gradient.addColorStop(0, '#4ecdc4');
+      gradient.addColorStop(0.5, '#45b7aa');
+      gradient.addColorStop(1, '#4ecdc4');
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.roundRect(stick.x, stick.y, stick.width, STICK_HEIGHT, 4);
+      ctx.fill();
+      
+      if (!stick.broken) {
+        ctx.shadowColor = '#4ecdc4';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      
+      ctx.globalAlpha = 1;
+    }
+    
+    function drawBreakEffect(x, y) {
+      if (!breakEffect) return;
+      
+      ctx.globalAlpha = breakEffect.alpha;
+      ctx.fillStyle = '#4ecdc4';
+      
+      breakEffect.particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      
+      ctx.globalAlpha = 1;
+    }
+    
+    function update() {
+      if (!gameRunning) return;
+      
+      ballVelocityY += GRAVITY;
+      ballY += ballVelocityY;
+      
+      const depth = Math.max(0, (ballY - 150) / 10);
+      highestDepth = Math.max(highestDepth, depth);
+      
+      sticks.forEach(stick => {
+        stick.y += ballVelocityY;
+      });
+      
+      while (lastStickY < CANVAS_HEIGHT + 200) {
+        lastStickY += STICK_SPACING;
+        sticks.push(createStick(lastStickY));
+      }
+      
+      sticks = sticks.filter(s => s.y > -50);
+      
+      for (let stick of sticks) {
+        if (!stick.broken && ballY + BALL_RADIUS > stick.y && ballY - BALL_RADIUS < stick.y + STICK_HEIGHT) {
+          if (Math.abs(ballY - stick.y - STICK_HEIGHT / 2) < BALL_RADIUS + STICK_HEIGHT / 2) {
+            stick.broken = true;
+            
+            currentDurability--;
+            
+            breakEffect = {
+              x: CANVAS_WIDTH / 2,
+              y: stick.y,
+              alpha: 1,
+              particles: []
+            };
+            
+            for (let i = 0; i < 8; i++) {
+              breakEffect.particles.push({
+                x: CANVAS_WIDTH / 2 + (Math.random() - 0.5) * 40,
+                y: stick.y + STICK_HEIGHT / 2,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                size: 2 + Math.random() * 3
+              });
+            }
+            
+            if (currentDurability <= 0) {
+              gameRunning = false;
+              setTimeout(() => {
+                state.maxDurability++;
+                initGame();
+                resetBall();
+              }, 500);
+            }
+            
+            saveState();
+          }
+        }
+      }
+      
+      if (breakEffect) {
+        breakEffect.alpha -= 0.03;
+        breakEffect.particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.1;
+        });
+        
+        if (breakEffect.alpha <= 0) {
+          breakEffect = null;
+        }
+      }
+      
+      if (ballY > CANVAS_HEIGHT + 100) {
+        ballY = CANVAS_HEIGHT + 100;
+        ballVelocityY = 0;
+      }
+    }
+    
+    function draw() {
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      for (let i = 0; i < CANVAS_WIDTH; i += 40) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, CANVAS_HEIGHT);
+        ctx.stroke();
+      }
+      
+      sticks.forEach(drawStick);
+      
+      if (gameRunning) {
+        drawBall(ballY);
+      }
+      
+      drawBreakEffect();
+      
+      if (!gameRunning) {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.fillStyle = '#e94560';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('BALL DESTROYED', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+        ctx.font = '16px sans-serif';
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`Depth: ${Math.floor(highestDepth)}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+      }
+    }
+    
+    function gameLoop() {
+      update();
+      draw();
+      updateDisplay();
+      requestAnimationFrame(gameLoop);
+    }
+    
+    initGame();
+    gameLoop();
+  </script>
+</body>
+</html>
