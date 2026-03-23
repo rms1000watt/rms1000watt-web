@@ -1,21 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#f5e6f8" />
-    <link rel="icon" type="image/png" href="./favicon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <title>Animal Empire</title>
-    <meta name="description" content="Collect adorable animals, watch them walk around, and grow your animal empire to trillions!" />
-    <script type="module" crossorigin src="./assets/index-DJGWXTTf.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-C7j2H5MT.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animal Empire</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .game {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    h1 { color: #333; margin-bottom: 10px; font-size: 1.5rem; }
+    .score { font-size: 2.5rem; font-weight: bold; color: #667eea; margin: 20px 0; }
+    .earnings { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+    .animals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+      min-height: 60px;
+    }
+    .animal {
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+      user-select: none;
+    }
+    .animal:hover { transform: scale(1.2); }
+    .animal:active { transform: scale(0.9); }
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      margin: 5px;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102,126,234,0.4); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .upgrades { margin-top: 20px; text-align: left; }
+    .upgrade {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 10px;
+      margin: 8px 0;
+    }
+    .upgrade-info { flex: 1; }
+    .upgrade-name { font-weight: bold; color: #333; }
+    .upgrade-cost { font-size: 0.8rem; color: #666; }
+    .buy-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <h1>🐾 Animal Empire</h1>
+    <div class="score" id="score">0</div>
+    <div class="earnings" id="earnings">+0 coins/sec</div>
+    
+    <div class="animals" id="animals"></div>
+    
+    <button class="btn" id="collectBtn" onclick="collectAnimal()">Collect Animal</button>
+    <button class="btn" onclick="buyAutoCollector()">Buy Auto Collector (100)</button>
+    
+    <div class="upgrades">
+      <h3 style="margin: 15px 0 10px; color: #333;">Upgrades</h3>
+      <div class="upgrade">
+        <div class="upgrade-info">
+          <div class="upgrade-name">Click Power</div>
+          <div class="upgrade-cost">+1 coin per click</div>
+        </div>
+        <button class="buy-btn" id="clickPowerBtn" onclick="buyClickPower()">50</button>
+      </div>
+      <div class="upgrade">
+        <div class="upgrade-info">
+          <div class="upgrade-name">Animal Happiness</div>
+          <div class="upgrade-cost">+10% earnings</div>
+        </div>
+        <button class="buy-btn" id="happinessBtn" onclick="buyHappiness()">100</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const ANIMALS = ['🐶', '🐱', '🐰', '🦊', '🐼', '🐨', '🦁', '🐯', '🐻', '🐵', '🐸', '🦄'];
+    const STORAGE_KEY = 'animal_empire_save';
+    
+    let state = loadState();
+    let clickPower = 1;
+    let happinessMultiplier = 1;
+    let autoCollectors = 0;
+    let usedAnimals = [];
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return {
+            coins: parsed.coins || 0,
+            clickPower: parsed.clickPower || 1,
+            happiness: parsed.happiness || 1,
+            autoCollectors: parsed.autoCollectors || 0,
+            animals: parsed.animals || [],
+            usedAnimals: parsed.usedAnimals || []
+          };
+        }
+      } catch (e) {}
+      return { coins: 0, clickPower: 1, happiness: 1, autoCollectors: 0, animals: [], usedAnimals: [] };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        coins: state.coins,
+        clickPower: state.clickPower,
+        happiness: state.happiness,
+        autoCollectors: state.autoCollectors,
+        animals: state.animals,
+        usedAnimals: state.usedAnimals
+      }));
+    }
+
+    function updateDisplay() {
+      document.getElementById('score').textContent = formatNumber(state.coins);
+      const perSec = calculatePerSecond();
+      document.getElementById('earnings').textContent = `+${formatNumber(perSec)} coins/sec`;
+      
+      document.getElementById('clickPowerBtn').disabled = state.coins < 50;
+      document.getElementById('happinessBtn').disabled = state.coins < 100;
+      
+      renderAnimals();
+    }
+
+    function formatNumber(n) {
+      if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+      if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
+      return Math.floor(n).toString();
+    }
+
+    function calculatePerSecond() {
+      return state.animals.length * 1 * state.happiness * (1 + state.autoCollectors * 0.5);
+    }
+
+    function collectAnimal() {
+      if (state.animals.length >= 20) {
+        showToast('Stable full! Get more coins to expand.');
+        return;
+      }
+      const available = ANIMALS.filter(a => !state.usedAnimals.includes(a));
+      if (available.length === 0) {
+        state.usedAnimals = [];
+      }
+      const animal = available[Math.floor(Math.random() * available.length)] || ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+      state.animals.push({ emoji: animal, x: Math.random() * 80 + 10, y: Math.random() * 80 + 10 });
+      state.usedAnimals.push(animal);
+      saveState();
+      updateDisplay();
+    }
+
+    function clickAnimal(index) {
+      const earned = clickPower * state.happiness;
+      state.coins += earned;
+      saveState();
+      updateDisplay();
+    }
+
+    function renderAnimals() {
+      const container = document.getElementById('animals');
+      container.innerHTML = '';
+      state.animals.forEach((animal, i) => {
+        const el = document.createElement('div');
+        el.className = 'animal';
+        el.textContent = animal.emoji;
+        el.onclick = () => clickAnimal(i);
+        el.style.position = 'relative';
+        el.style.animation = `float ${2 + Math.random()}s ease-in-out infinite`;
+        el.style.animationDelay = `${Math.random()}s`;
+        container.appendChild(el);
+      });
+      
+      if (!document.getElementById('floatStyle')) {
+        const style = document.createElement('style');
+        style.id = 'floatStyle';
+        style.textContent = `@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }`;
+        document.head.appendChild(style);
+      }
+    }
+
+    function buyClickPower() {
+      if (state.coins >= 50) {
+        state.coins -= 50;
+        clickPower += 1;
+        state.clickPower = clickPower;
+        saveState();
+        updateDisplay();
+        showToast(`Click power: ${clickPower}`);
+      }
+    }
+
+    function buyHappiness() {
+      if (state.coins >= 100) {
+        state.coins -= 100;
+        state.happiness += 0.1;
+        happinessMultiplier = state.happiness;
+        saveState();
+        updateDisplay();
+        showToast(`Happiness: ${(state.happiness * 100).toFixed(0)}%`);
+      }
+    }
+
+    function buyAutoCollector() {
+      if (state.coins >= 100) {
+        state.coins -= 100;
+        state.autoCollectors++;
+        autoCollectors = state.autoCollectors;
+        saveState();
+        updateDisplay();
+        showToast(`Auto collectors: ${autoCollectors}`);
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    setInterval(() => {
+      const perSec = calculatePerSecond();
+      if (perSec > 0) {
+        state.coins += perSec / 10;
+        saveState();
+        updateDisplay();
+      }
+    }, 100);
+
+    clickPower = state.clickPower;
+    happinessMultiplier = state.happiness;
+    autoCollectors = state.autoCollectors;
+
+    updateDisplay();
+  </script>
+</body>
 </html>
