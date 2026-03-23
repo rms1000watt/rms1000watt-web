@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elastomania</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #2d1b4e 0%, #1a1033 50%, #0d0d1a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      overflow: hidden;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 10px;
+    }
+    h1 { 
+      color: #ff6b35; 
+      font-size: 1.5rem; 
+      text-shadow: 0 0 20px rgba(255,107,53,0.5);
+      font-style: italic;
+    }
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+    .stat {
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .stat-label { color: #888; font-size: 0.7rem; display: block; }
+    #gameCanvas {
+      border: 4px solid #ff6b35;
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(255,107,53,0.3);
+    }
+    .controls-info {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 800px;
+      margin-top: 15px;
+      color: #aaa;
+      font-size: 0.8rem;
+    }
+    .key {
+      background: #333;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin: 0 3px;
+      border: 1px solid #555;
+    }
+    .level-info {
+      color: #4ecdc4;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>ELASTOMANIA</h1>
+    <div class="stats">
+      <div>
+        <span class="stat-label">TIME</span>
+        <span class="stat" id="timer">0:00</span>
+      </div>
+      <div>
+        <span class="stat-label">APPLES</span>
+        <span class="stat" id="apples">0/10</span>
+      </div>
+      <div>
+        <span class="stat-label">BEST</span>
+        <span class="stat" id="best">--:--</span>
+      </div>
+    </div>
+  </div>
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
+  <div class="controls-info">
+    <div>
+      <span class="key">←</span>/<span class="key">→</span> Balance
+      <span class="key">↑</span> Accelerate
+      <span class="key">↓</span> Brake
+      <span class="key">R</span> Reset
+    </div>
+    <div class="level-info">Level 1 - First Ride</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const CANVAS_WIDTH = canvas.width;
+    const CANVAS_HEIGHT = canvas.height;
+    const GRAVITY = 0.4;
+    const FRICTION = 0.98;
+    const GROUND_FRICTION = 0.95;
+    
+    const STORAGE_KEY = 'elastomania_save';
+    
+    let state = loadState();
+    let cameraX = 0;
+    let gameTime = 0;
+    let gameStarted = false;
+    let gameWon = false;
+    
+    const keys = {};
+    
+    const bike = {
+      x: 150,
+      y: 300,
+      vx: 0,
+      vy: 0,
+      angle: 0,
+      angularVel: 0,
+      wheelRadius: 18,
+      wheelBase: 50,
+      onGround: false,
+      wheelRotation: 0
+    };
+    
+    const terrain = [
+      { x: 0, y: 400, width: 300 },
+      { x: 250, y: 420, width: 100, height: 80 },
+      { x: 350, y: 400, width: 150 },
+      { x: 500, y: 380, width: 80 },
+      { x: 550, y: 400, width: 200 },
+      { x: 750, y: 350, width: 100 },
+      { x: 800, y: 400, width: 300 },
+      { x: 1050, y: 380, width: 150 },
+      { x: 1150, y: 400, width: 200 },
+      { x: 1300, y: 350, width: 100 },
+      { x: 1350, y: 400, width: 400 },
+      { x: 1750, y: 380, width: 150 },
+      { x: 1850, y: 350, width: 100 },
+      { x: 1900, y: 400, width: 500 },
+      { x: 2400, y: 420, width: 300 }
+    ];
+    
+    const apples = [
+      { x: 300, y: 360, collected: false },
+      { x: 450, y: 340, collected: false },
+      { x: 600, y: 340, collected: false },
+      { x: 800, y: 310, collected: false },
+      { x: 1000, y: 330, collected: false },
+      { x: 1200, y: 360, collected: false },
+      { x: 1400, y: 310, collected: false },
+      { x: 1600, y: 350, collected: false },
+      { x: 1800, y: 300, collected: false },
+      { x: 2100, y: 360, collected: false }
+    ];
+    
+    const finishLine = { x: 2650, y: 400 };
+    
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return { bestTime: null, apples: 0 };
+    }
+    
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return m + ':' + s.toString().padStart(2, '0');
+    }
+    
+    function updateDisplay() {
+      document.getElementById('timer').textContent = formatTime(Math.floor(gameTime));
+      const collected = apples.filter(a => a.collected).length;
+      document.getElementById('apples').textContent = collected + '/' + apples.length;
+      document.getElementById('best').textContent = state.bestTime ? formatTime(state.bestTime) : '--:--';
+    }
+    
+    function getGroundY(x) {
+      for (let t of terrain) {
+        if (x >= t.x && x <= t.x + t.width) {
+          return t.y;
+        }
+      }
+      return 500;
+    }
+    
+    function resetGame() {
+      bike.x = 150;
+      bike.y = 300;
+      bike.vx = 0;
+      bike.vy = 0;
+      bike.angle = 0;
+      bike.angularVel = 0;
+      bike.wheelRotation = 0;
+      bike.onGround = false;
+      cameraX = 0;
+      gameTime = 0;
+      gameStarted = false;
+      gameWon = false;
+      apples.forEach(a => a.collected = false);
+      updateDisplay();
+    }
+    
+    function update() {
+      if (gameWon) return;
+      
+      if (!gameStarted && (keys['ArrowUp'] || keys['KeyW'])) {
+        gameStarted = true;
+      }
+      
+      if (gameStarted) {
+        gameTime += 1/60;
+      }
+      
+      if (keys['ArrowLeft'] || keys['KeyA']) {
+        bike.angularVel -= 0.003;
+      }
+      if (keys['ArrowRight'] || keys['KeyD']) {
+        bike.angularVel += 0.003;
+      }
+      
+      const accel = keys['ArrowUp'] || keys['KeyW'];
+      const brake = keys['ArrowDown'] || keys['KeyS'];
+      
+      const wheelOffset = bike.wheelBase / 2;
+      const backWheelX = bike.x - Math.cos(bike.angle) * wheelOffset;
+      const frontWheelX = bike.x + Math.cos(bike.angle) * wheelOffset;
+      
+      const backGroundY = getGroundY(backWheelX);
+      const frontGroundY = getGroundY(frontWheelX);
+      
+      const backWheelY = bike.y + Math.sin(bike.angle) * wheelOffset;
+      const frontWheelY = bike.y - Math.sin(bike.angle) * wheelOffset;
+      
+      const backOnGround = backWheelY + bike.wheelRadius >= backGroundY - 2;
+      const frontOnGround = frontWheelY + bike.wheelRadius >= frontGroundY - 2;
+      bike.onGround = backOnGround || frontOnGround;
+      
+      if (bike.onGround) {
+        if (accel) {
+          const force = 0.3;
+          bike.vx += Math.cos(bike.angle) * force;
+          bike.vy += Math.sin(bike.angle) * force;
+          bike.wheelRotation += 0.3;
+        }
+        if (brake) {
+          bike.vx *= 0.95;
+          bike.vy *= 0.95;
+        }
+        
+        const targetAngle = Math.atan2(frontGroundY - backGroundY, frontWheelX - backWheelX);
+        bike.angle += (targetAngle - bike.angle) * 0.1;
+      } else {
+        bike.angularVel += 0.001 * (keys['ArrowLeft'] || keys['KeyA'] ? -1 : 0);
+        bike.angularVel += 0.001 * (keys['ArrowRight'] || keys['KeyD'] ? 1 : 0);
+      }
+      
+      bike.vy += GRAVITY;
+      
+      bike.vx *= FRICTION;
+      bike.vy *= FRICTION;
+      bike.angularVel *= 0.95;
+      
+      bike.x += bike.vx;
+      bike.y += bike.vy;
+      bike.angle += bike.angularVel;
+      
+      const centerY = getGroundY(bike.x);
+      if (bike.y + bike.wheelRadius > centerY) {
+        bike.y = centerY - bike.wheelRadius;
+        bike.vy = 0;
+      }
+      
+      if (bike.x < 50) { bike.x = 50; bike.vx = 0; }
+      
+      if (bike.x >= finishLine.x - 30 && bike.x <= finishLine.x + 30) {
+        gameWon = true;
+        if (!state.bestTime || gameTime < state.bestTime) {
+          state.bestTime = gameTime;
+          state.apples = apples.filter(a => a.collected).length;
+          saveState();
+        }
+      }
+      
+      for (let apple of apples) {
+        if (!apple.collected) {
+          const dx = bike.x - apple.x;
+          const dy = bike.y - apple.y;
+          if (Math.sqrt(dx*dx + dy*dy) < 40) {
+            apple.collected = true;
+          }
+        }
+      }
+      
+      cameraX = bike.x - CANVAS_WIDTH / 3;
+      if (cameraX < 0) cameraX = 0;
+      if (cameraX > 1500) cameraX = 1500;
+    }
+    
+    function drawWheel(x, y, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      
+      ctx.beginPath();
+      ctx.arc(0, 0, bike.wheelRadius, 0, Math.PI * 2);
+      const wheelGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, bike.wheelRadius);
+      wheelGrad.addColorStop(0, '#444');
+      wheelGrad.addColorStop(0.7, '#222');
+      wheelGrad.addColorStop(1, '#111');
+      ctx.fillStyle = wheelGrad;
+      ctx.fill();
+      ctx.strokeStyle = '#666';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(a) * (bike.wheelRadius - 2), Math.sin(a) * (bike.wheelRadius - 2));
+        ctx.stroke();
+      }
+      
+      ctx.beginPath();
+      ctx.arc(0, 0, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#888';
+      ctx.fill();
+      
+      ctx.restore();
+    }
+    
+    function drawBike() {
+      const wheelOffset = bike.wheelBase / 2;
+      
+      const backWheelX = bike.x - Math.cos(bike.angle) * wheelOffset;
+      const backWheelY = bike.y + Math.sin(bike.angle) * wheelOffset;
+      const frontWheelX = bike.x + Math.cos(bike.angle) * wheelOffset;
+      const frontWheelY = bike.y - Math.sin(bike.angle) * wheelOffset;
+      
+      drawWheel(backWheelX, backWheelY, bike.wheelRotation);
+      drawWheel(frontWheelX, frontWheelY, bike.wheelRotation);
+      
+      ctx.save();
+      ctx.translate(bike.x, bike.y);
+      ctx.rotate(bike.angle);
+      
+      ctx.beginPath();
+      ctx.moveTo(-15, -5);
+      ctx.lineTo(15, -8);
+      ctx.lineTo(12, 5);
+      ctx.lineTo(-10, 8);
+      ctx.closePath();
+      const bodyGrad = ctx.createLinearGradient(-15, -8, 15, 8);
+      bodyGrad.addColorStop(0, '#e63946');
+      bodyGrad.addColorStop(0.5, '#c1121f');
+      bodyGrad.addColorStop(1, '#780000');
+      ctx.fillStyle = bodyGrad;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(-12, -10);
+      ctx.lineTo(-20, -25);
+      ctx.lineTo(-15, -20);
+      ctx.closePath();
+      ctx.fillStyle = '#2d1b4e';
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(-18, -26);
+      ctx.ellipse(-18, -32, 6, 8, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#f4d35e';
+      ctx.fill();
+      ctx.strokeStyle = '#f4a261';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(10, -12);
+      ctx.lineTo(22, -30);
+      ctx.lineTo(18, -25);
+      ctx.closePath();
+      ctx.fillStyle = '#333';
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.moveTo(-5, -15);
+      ctx.quadraticCurveTo(0, -20, 5, -15);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#f4d35e';
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.ellipse(0, -28, 7, 9, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#f4d35e';
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.ellipse(2, -30, 2, 3, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#333';
+      ctx.fill();
+      
+      ctx.restore();
+    }
+    
+    function drawTerrain() {
+      for (let t of terrain) {
+        const screenX = t.x - cameraX;
+        if (screenX + t.width < -50 || screenX > CANVAS_WIDTH + 50) continue;
+        
+        ctx.beginPath();
+        ctx.moveTo(screenX, CANVAS_HEIGHT);
+        ctx.lineTo(screenX, t.y);
+        ctx.lineTo(screenX + t.width, t.y);
+        ctx.lineTo(screenX + t.width, CANVAS_HEIGHT);
+        ctx.closePath();
+        
+        const groundGrad = ctx.createLinearGradient(0, t.y, 0, CANVAS_HEIGHT);
+        groundGrad.addColorStop(0, '#4a7c59');
+        groundGrad.addColorStop(0.1, '#3d6b4a');
+        groundGrad.addColorStop(1, '#1a3322');
+        ctx.fillStyle = groundGrad;
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(screenX, t.y);
+        ctx.lineTo(screenX + t.width, t.y);
+        ctx.strokeStyle = '#5a9c69';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < t.width; i += 20) {
+          ctx.beginPath();
+          ctx.moveTo(screenX + i, t.y);
+          ctx.lineTo(screenX + i + 10, t.y + 10);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    function drawApples() {
+      for (let apple of apples) {
+        if (apple.collected) continue;
+        
+        const screenX = apple.x - cameraX;
+        if (screenX < -50 || screenX > CANVAS_WIDTH + 50) continue;
+        
+        ctx.beginPath();
+        ctx.moveTo(apple.x - cameraX - 12, apple.y);
+        ctx.quadraticCurveTo(apple.x - cameraX, apple.y - 20, apple.x - cameraX + 12, apple.y);
+        ctx.quadraticCurveTo(apple.x - cameraX, apple.y + 5, apple.x - cameraX - 12, apple.y);
+        const appleGrad = ctx.createRadialGradient(apple.x - cameraX - 3, apple.y - 5, 0, apple.x - cameraX, apple.y, 12);
+        appleGrad.addColorStop(0, '#ff6b6b');
+        appleGrad.addColorStop(0.7, '#ee2222');
+        appleGrad.addColorStop(1, '#aa0000');
+        ctx.fillStyle = appleGrad;
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(apple.x - cameraX, apple.y - 15);
+        ctx.lineTo(apple.x - cameraX + 3, apple.y - 25);
+        ctx.lineTo(apple.x - cameraX - 2, apple.y - 20);
+        ctx.closePath();
+        ctx.fillStyle = '#4a7c59';
+        ctx.fill();
+      }
+    }
+    
+    function drawFinishLine() {
+      const screenX = finishLine.x - cameraX;
+      if (screenX < -50 || screenX > CANVAS_WIDTH + 50) return;
+      
+      for (let i = 0; i < 8; i++) {
+        ctx.fillStyle = i % 2 === 0 ? '#fff' : '#000';
+        ctx.fillRect(screenX + i * 10, finishLine.y - 80, 10, 80);
+      }
+      
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('FINISH', screenX + 35, finishLine.y - 90);
+    }
+    
+    function drawBackground() {
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+      bgGrad.addColorStop(0, '#1a1033');
+      bgGrad.addColorStop(0.5, '#2d1b4e');
+      bgGrad.addColorStop(1, '#0d0d1a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      for (let i = 0; i < 50; i++) {
+        const sx = ((i * 73 + cameraX * 0.1) % (CANVAS_WIDTH + 100)) - 50;
+        const sy = (i * 37) % 200 + 20;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function draw() {
+      drawBackground();
+      drawTerrain();
+      drawApples();
+      drawFinishLine();
+      drawBike();
+      
+      if (gameWon) {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 48px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('LEVEL COMPLETE!', CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - 40);
+        
+        const collected = apples.filter(a => a.collected).length;
+        ctx.fillStyle = '#ff6b35';
+        ctx.font = '24px sans-serif';
+        ctx.fillText(`Time: ${formatTime(Math.floor(gameTime))}`, CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 10);
+        ctx.fillText(`Apples: ${collected}/${apples.length}`, CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 50);
+        
+        ctx.fillStyle = '#aaa';
+        ctx.font = '16px sans-serif';
+        ctx.fillText('Press R to play again', CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 100);
+      }
+      
+      if (!gameStarted) {
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 32px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Press UP to Start', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+      }
+    }
+    
+    function gameLoop() {
+      update();
+      draw();
+      updateDisplay();
+      requestAnimationFrame(gameLoop);
+    }
+    
+    document.addEventListener('keydown', e => {
+      keys[e.code] = true;
+      if (e.code === 'KeyR') resetGame();
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) {
+        e.preventDefault();
+      }
+    });
+    
+    document.addEventListener('keyup', e => {
+      keys[e.code] = false;
+    });
+    
+    resetGame();
+    gameLoop();
+  </script>
+</body>
+</html>
