@@ -88,6 +88,43 @@
       text-decoration: underline;
     }
 
+    .sitemap-group {
+      margin-bottom: 8px;
+    }
+
+    .sitemap-group-title {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #1a1a1a;
+      font-size: 0.95rem;
+    }
+
+    .sitemap-group-title:hover {
+      text-decoration: underline;
+    }
+
+    .sitemap-group-title .arrow {
+      transition: transform 0.2s;
+      font-size: 0.75rem;
+      color: #999;
+    }
+
+    .sitemap-group.open .arrow {
+      transform: rotate(90deg);
+    }
+
+    .sitemap-group-items {
+      display: none;
+      padding-left: 20px;
+      margin-top: 4px;
+    }
+
+    .sitemap-group.open .sitemap-group-items {
+      display: block;
+    }
+
     @media (min-width: 600px) {
       body {
         padding: 100px 40px;
@@ -114,7 +151,14 @@
 
     <h2 class="sitemap-title">Site Map</h2>
     <nav class="sitemap">
-      <a href="./friends/grand/">friends/grand</a>
+      <div class="sitemap-group">
+        <div class="sitemap-group-title" onclick="this.parentElement.classList.toggle('open')">
+          friends <span class="arrow">▸</span>
+        </div>
+        <div class="sitemap-group-items">
+          <a href="./friends/grand/">grand</a>
+        </div>
+      </div>
       <a href="./hello-world-tigerbeetle/">hello-world-tigerbeetle</a>
       <a href="./hello-world-pixijs/">hello-world-pixijs</a>
       <a href="./hello-world-stategraph/">hello-world-stategraph</a>
