@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hello World TigerBeetle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f1f5f9; }
+    .container { max-width: 800px; padding: 60px 20px; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hello World TigerBeetle</h1>
+    <p>A simple example using TigerBeetle, a distributed financial transactions database.</p>
+    <h2>Install</h2>
+    <pre>curl -Lo tigerbeetle.zip https://mac.tigerbeetle.com
+unzip tigerbeetle.zip
+rm tigerbeetle.zip
+sudo mv tigerbeetle /usr/local/bin
+
+tigerbeetle version</pre>
+    <h2>Quick Start</h2>
+    <pre># create a save file
+tigerbeetle format --cluster=0 --replica=0 --replica-count=1 --development ./0_0.tigerbeetle
+
+# start a replica
+tigerbeetle start --addresses=3000 --development ./0_0.tigerbeetle</pre>
+    <p><a href="https://tigerbeetle.com" target="_blank">Learn more →</a></p>
+    <hr>
+    <p><a href="../">&larr; Back to Home</a></p>
+  </div>
+</body>
+</html>
