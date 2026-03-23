@@ -4,177 +4,122 @@
   <meta charset="utf-8">
   <title>Ryan Smith</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ryan Smith - DevOps Engineer">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
-      font-family: 'Press Start 2P', monospace;
-      background: #87ceeb;
-    }
-
-    .container {
-      max-width: 900px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      max-width: 640px;
       margin: 0 auto;
-      padding: 10px;
+      padding: 60px 20px;
     }
 
-    .box-3d {
-      background: #c0c0c0;
-      border: 3px solid;
-      border-color: #fff #808080 #808080 #fff;
-      box-shadow: 4px 4px 0 #404040;
-      padding: 15px;
-      margin-bottom: 15px;
+    .name {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
     }
 
-    .box-3d-inverted {
-      background: #404040;
-      border: 3px solid;
-      border-color: #808080 #fff #fff #808080;
-      padding: 15px;
-    }
-
-    .hero { text-align: center; }
-
-    .title {
-      font-size: 1.2rem;
-      color: #ffd700;
-      text-shadow: 2px 2px 0 #ff8c00, -1px -1px 0 #000;
-      margin-bottom: 10px;
-      line-height: 1.4;
-    }
-
-    .profile-image {
-      width: 100px;
-      height: 100px;
-      border: 3px solid #000;
-      display: inline-block;
-      image-rendering: pixelated;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      font-size: 0.5rem;
-      color: #00ff00;
-      text-shadow: 1px 1px 0 #000;
-      margin-bottom: 10px;
+    .tagline {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 24px;
     }
 
     .bio {
-      font-size: 0.45rem;
-      color: #fff;
-      text-shadow: 1px 1px 0 #000;
-      line-height: 1.8;
-      margin-bottom: 15px;
+      font-size: 1rem;
+      color: #333;
+      margin-bottom: 32px;
+      max-width: 520px;
     }
 
-    .social-row {
+    .links {
       display: flex;
-      justify-content: center;
-      gap: 8px;
+      gap: 20px;
+      margin-bottom: 60px;
       flex-wrap: wrap;
     }
 
-    .social-btn {
-      padding: 8px 12px;
-      background: #ff0000;
-      color: #fff;
+    .links a {
+      color: #1a1a1a;
       text-decoration: none;
-      font-size: 0.5rem;
-      border: 3px solid;
-      border-color: #ff8080 #800000 #800000 #ff8080;
-      box-shadow: 2px 2px 0 #800000;
+      font-size: 0.95rem;
     }
 
-    .section-title {
-      font-size: 0.7rem;
-      color: #00ffff;
-      text-shadow: 2px 2px 0 #008b8b;
-      text-align: center;
-      margin: 15px 0 10px;
+    .links a:hover {
+      text-decoration: underline;
     }
 
-    .site-list { list-style: none; }
+    .divider {
+      border: none;
+      border-top: 1px solid #e5e5e5;
+      margin: 48px 0;
+    }
 
-    .site-link {
-      color: #00ffff;
+    .sitemap-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #999;
+      margin-bottom: 16px;
+    }
+
+    .sitemap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sitemap a {
+      color: #1a1a1a;
       text-decoration: none;
-      font-size: 0.5rem;
-      padding: 4px 0;
-      display: block;
+      font-size: 0.95rem;
     }
 
-    .site-link:hover { color: #ffd700; }
-
-    .poly-1, .poly-2, .poly-3, .poly-4 {
-      display: none;
+    .sitemap a:hover {
+      text-decoration: underline;
     }
-
-    .heart {
-      font-size: 1rem;
-      color: #ff0000;
-      text-shadow: 1px 1px 0 #800000;
-    }
-
-    .health-bar { margin-top: 10px; }
 
     @media (min-width: 600px) {
-      .title { font-size: 1.8rem; }
-      .profile-image { width: 150px; height: 150px; }
-      .subtitle { font-size: 0.7rem; }
-      .bio { font-size: 0.55rem; }
-      .social-btn { padding: 12px 20px; font-size: 0.6rem; }
-      .site-link { font-size: 0.55rem; }
-      .box-3d { padding: 30px; margin-bottom: 20px; }
-      .box-3d-inverted { padding: 20px; }
-      .section-title { font-size: 0.9rem; margin: 20px 0 15px; }
-      .poly-1, .poly-2, .poly-3, .poly-4 {
-        display: block;
-        position: fixed;
-        width: 0;
-        height: 0;
-        opacity: 0.3;
-        z-index: -1;
+      body {
+        padding: 100px 40px;
       }
-      .poly-1 { top: 10%; left: 5%; border-left: 40px solid transparent; border-right: 40px solid transparent; border-bottom: 70px solid #ff6b6b; }
-      .poly-2 { top: 30%; right: 10%; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid #4ecdc4; }
-      .poly-3 { bottom: 20%; left: 15%; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 60px solid #ffe66d; }
-      .poly-4 { bottom: 10%; right: 5%; border-left: 45px solid transparent; border-right: 45px solid transparent; border-bottom: 80px solid #95e1d3; }
+      .name {
+        font-size: 2.25rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="poly-1"></div>
-  <div class="poly-2"></div>
-  <div class="poly-3"></div>
-  <div class="poly-4"></div>
+  <main>
+    <h1 class="name">Ryan Smith</h1>
+    <p class="tagline">DevOps Engineer · Irvine, CA</p>
+    <p class="bio">
+      Expert DevOps engineer with experience in AWS, managing Kubernetes via Helmfile and writing Golang tooling.
+    </p>
+    <div class="links">
+      <a href="https://twitter.com/rms1000watt" target="_blank">Twitter</a>
+      <a href="https://github.com/rms1000watt" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/ryanmatthewsmith" target="_blank">LinkedIn</a>
+    </div>
 
-  <div class="container">
-    <section class="hero box-3d">
-      <h1 class="title">RYAN SMITH</h1>
-      <img src="images/author.jpg" alt="Ryan Smith" class="profile-image">
-      <p class="subtitle">DEVOPS ENGINEER</p>
-      <p class="bio">EXPERT DEVOPS ENGINEER WITH EXPERIENCE IN AWS, MANAGING KUBERNETES VIA HELMFILE AND WRITING GOLANG TOOLING.</p>
-      <div class="social-row">
-        <a href="https://twitter.com/rms1000watt" class="social-btn" target="_blank">TWITTER</a>
-        <a href="https://github.com/rms1000watt" class="social-btn" target="_blank">GITHUB</a>
-        <a href="https://linkedin.com/in/ryanmatthewsmith" class="social-btn" target="_blank">LINKEDIN</a>
-      </div>
-      <div class="health-bar">
-        <span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>
-      </div>
-    </section>
+    <hr class="divider">
 
-    <h2 class="section-title">SITE MAP</h2>
-
-    <ul class="site-list box-3d-inverted">
-      <li><a href="./grand/" class="site-link">grand/</a></li>
-      <li><a href="./hello-world-tigerbeetle/" class="site-link">hello-world-tigerbeetle/</a></li>
-      <li><a href="./hello-world-pixijs/" class="site-link">hello-world-pixijs/</a></li>
-      <li><a href="./hello-world-stategraph/" class="site-link">hello-world-stategraph/</a></li>
-    </ul>
-  </div>
+    <h2 class="sitemap-title">Projects</h2>
+    <nav class="sitemap">
+      <a href="./grand/">grand</a>
+      <a href="./hello-world-tigerbeetle/">hello-world-tigerbeetle</a>
+      <a href="./hello-world-pixijs/">hello-world-pixijs</a>
+      <a href="./hello-world-stategraph/">hello-world-stategraph</a>
+    </nav>
+  </main>
 </body>
 </html>
