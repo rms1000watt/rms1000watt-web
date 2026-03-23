@@ -113,22 +113,22 @@
     
     const CANVAS_WIDTH = canvas.width;
     const CANVAS_HEIGHT = canvas.height;
-    const STICK_SPACING = 120;
+    const BALL_X = CANVAS_WIDTH / 2;
+    const BALL_Y = CANVAS_HEIGHT * 0.3;
+    const STICK_SPACING = 100;
     const STICK_HEIGHT = 8;
-    const STICK_WIDTH_MIN = 60;
-    const STICK_WIDTH_MAX = 120;
+    const STICK_WIDTH_MIN = 80;
+    const STICK_WIDTH_MAX = 160;
     const BALL_RADIUS = 12;
-    const GRAVITY = 0.25;
+    const GRAVITY = 0.15;
+    const MAX_VELOCITY = 12;
     
     let state = loadState();
-    let ballY = 100;
-    let ballVelocityY = 0;
+    let velocity = 0;
     let sticks = [];
     let gameRunning = true;
     let currentDurability;
-    let lastStickY = CANVAS_HEIGHT + 100;
-    let breakEffect = null;
-    let highestDepth = 0;
+    let score = 0;
     
     function loadState() {
       try {
@@ -143,7 +143,7 @@
     }
     
     function updateDisplay() {
-      document.getElementById('depth').textContent = Math.floor(highestDepth);
+      document.getElementById('depth').textContent = Math.floor(score);
       document.getElementById('best').textContent = Math.floor(state.bestDepth);
       document.getElementById('durability').textContent = currentDurability + '/' + state.maxDurability;
       document.getElementById('coins').textContent = formatNumber(state.coins);
@@ -188,46 +188,43 @@
         y: y,
         x: Math.random() * (CANVAS_WIDTH - STICK_WIDTH_MAX - 40) + 20,
         width: STICK_WIDTH_MIN + Math.random() * (STICK_WIDTH_MAX - STICK_WIDTH_MIN),
-        broken: false
+        broken: false,
+        passed: false
       };
     }
     
     function initGame() {
-      ballY = 150;
-      ballVelocityY = 0;
+      velocity = 0;
       sticks = [];
-      lastStickY = CANVAS_HEIGHT + 50;
-      breakEffect = null;
-      highestDepth = 0;
+      score = 0;
       currentDurability = state.maxDurability;
       
-      for (let i = 0; i < 8; i++) {
-        sticks.push(createStick(CANVAS_HEIGHT - 100 - i * STICK_SPACING));
+      sticks.push(createStick(BALL_Y + STICK_SPACING));
+      for (let i = 1; i < 10; i++) {
+        sticks.push(createStick(BALL_Y + i * STICK_SPACING));
       }
-      lastStickY = CANVAS_HEIGHT - 100 - 7 * STICK_SPACING;
       
       gameRunning = true;
     }
     
-    function resetBall() {
-      ballY = 150;
-      ballVelocityY = 0;
-      
-      if (highestDepth > state.bestDepth) {
-        state.bestDepth = highestDepth;
+    function resetGame() {
+      if (score > state.bestDepth) {
+        state.bestDepth = score;
         showToast(`New Best: ${Math.floor(state.bestDepth)}!`);
       }
       
-      state.coins += Math.floor(highestDepth / 10);
+      state.coins += Math.floor(score / 10);
       saveState();
       
-      showToast(`Reset! +${Math.floor(highestDepth / 10)} coins`);
+      showToast(`Reset! +${Math.floor(score / 10)} coins`);
+      
+      initGame();
     }
     
-    function drawBall(y) {
+    function drawBall() {
       ctx.beginPath();
-      ctx.arc(CANVAS_WIDTH / 2, y, BALL_RADIUS, 0, Math.PI * 2);
-      const gradient = ctx.createRadialGradient(CANVAS_WIDTH / 2 - 4, y - 4, 0, CANVAS_WIDTH / 2, y, BALL_RADIUS);
+      ctx.arc(BALL_X, BALL_Y, BALL_RADIUS, 0, Math.PI * 2);
+      const gradient = ctx.createRadialGradient(BALL_X - 4, BALL_Y - 4, 0, BALL_X, BALL_Y, BALL_RADIUS);
       gradient.addColorStop(0, '#ff6b6b');
       gradient.addColorStop(1, '#c73e54');
       ctx.fillStyle = gradient;
@@ -252,105 +249,49 @@
       ctx.roundRect(stick.x, stick.y, stick.width, STICK_HEIGHT, 4);
       ctx.fill();
       
-      if (!stick.broken) {
-        ctx.shadowColor = '#4ecdc4';
-        ctx.shadowBlur = 10;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-      
-      ctx.globalAlpha = 1;
-    }
-    
-    function drawBreakEffect(x, y) {
-      if (!breakEffect) return;
-      
-      ctx.globalAlpha = breakEffect.alpha;
-      ctx.fillStyle = '#4ecdc4';
-      
-      breakEffect.particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      
       ctx.globalAlpha = 1;
     }
     
     function update() {
       if (!gameRunning) return;
       
-      ballVelocityY += GRAVITY;
-      ballY += ballVelocityY;
-      
-      const depth = Math.max(0, (ballY - 150) / 10);
-      highestDepth = Math.max(highestDepth, depth);
+      velocity = Math.min(velocity + GRAVITY, MAX_VELOCITY);
       
       sticks.forEach(stick => {
-        stick.y += ballVelocityY;
+        stick.y -= velocity;
       });
-      
-      while (lastStickY < CANVAS_HEIGHT + 200) {
-        lastStickY += STICK_SPACING;
-        sticks.push(createStick(lastStickY));
-      }
       
       sticks = sticks.filter(s => s.y > -50);
       
+      while (sticks.length < 10) {
+        const lastStick = sticks[sticks.length - 1];
+        sticks.push(createStick(lastStick.y + STICK_SPACING));
+      }
+      
       for (let stick of sticks) {
-        if (!stick.broken && ballY + BALL_RADIUS > stick.y && ballY - BALL_RADIUS < stick.y + STICK_HEIGHT) {
-          if (Math.abs(ballY - stick.y - STICK_HEIGHT / 2) < BALL_RADIUS + STICK_HEIGHT / 2) {
-            stick.broken = true;
-            
-            currentDurability--;
-            
-            breakEffect = {
-              x: CANVAS_WIDTH / 2,
-              y: stick.y,
-              alpha: 1,
-              particles: []
-            };
-            
-            for (let i = 0; i < 8; i++) {
-              breakEffect.particles.push({
-                x: CANVAS_WIDTH / 2 + (Math.random() - 0.5) * 40,
-                y: stick.y + STICK_HEIGHT / 2,
-                vx: (Math.random() - 0.5) * 4,
-                vy: (Math.random() - 0.5) * 4,
-                size: 2 + Math.random() * 3
-              });
-            }
-            
-            if (currentDurability <= 0) {
-              gameRunning = false;
-              setTimeout(() => {
-                state.maxDurability++;
-                initGame();
-                resetBall();
-              }, 500);
-            }
-            
-            saveState();
-          }
+        if (!stick.passed && stick.y < BALL_Y - BALL_RADIUS - STICK_HEIGHT) {
+          stick.passed = true;
+          score += 1;
         }
-      }
-      
-      if (breakEffect) {
-        breakEffect.alpha -= 0.03;
-        breakEffect.particles.forEach(p => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vy += 0.1;
-        });
         
-        if (breakEffect.alpha <= 0) {
-          breakEffect = null;
+        if (!stick.broken && 
+            stick.y + STICK_HEIGHT > BALL_Y - BALL_RADIUS && 
+            stick.y < BALL_Y + BALL_RADIUS &&
+            BALL_X + BALL_RADIUS > stick.x && 
+            BALL_X - BALL_RADIUS < stick.x + stick.width) {
+          stick.broken = true;
+          currentDurability--;
+          
+          if (currentDurability <= 0) {
+            gameRunning = false;
+            setTimeout(() => {
+              state.maxDurability++;
+              resetGame();
+            }, 500);
+          }
+          
+          saveState();
         }
-      }
-      
-      if (ballY > CANVAS_HEIGHT + 100) {
-        ballY = CANVAS_HEIGHT + 100;
-        ballVelocityY = 0;
       }
     }
     
@@ -369,10 +310,8 @@
       sticks.forEach(drawStick);
       
       if (gameRunning) {
-        drawBall(ballY);
+        drawBall();
       }
-      
-      drawBreakEffect();
       
       if (!gameRunning) {
         ctx.fillStyle = 'rgba(0,0,0,0.7)';
@@ -383,7 +322,7 @@
         ctx.fillText('BALL DESTROYED', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
         ctx.font = '16px sans-serif';
         ctx.fillStyle = '#fff';
-        ctx.fillText(`Depth: ${Math.floor(highestDepth)}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+        ctx.fillText(`Depth: ${Math.floor(score)}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
       }
     }
     
