@@ -75,71 +75,32 @@
       color: white;
       transform: translateY(-3px);
     }
-    .browser {
-      max-width: 600px;
-      margin: 40px auto;
-      background: #c0c0c0;
-      border: 2px solid;
-      border-color: #ffffff #808080 #808080 #ffffff;
-      padding: 2px;
+    .sitemap {
+      padding: 60px 20px;
     }
-    .browser-titlebar {
-      background: linear-gradient(90deg, #000080, #1084d0);
-      color: white;
-      padding: 4px 6px;
-      font-size: 12px;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .browser-buttons span {
-      display: inline-block;
-      width: 16px;
-      height: 14px;
-      background: #c0c0c0;
-      border: 1px solid;
-      border-color: #ffffff #808080 #808080 #ffffff;
+    .sitemap h2 {
       text-align: center;
-      line-height: 12px;
-      font-size: 10px;
-      color: black;
-      margin-left: 2px;
-      cursor: pointer;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 32px;
     }
-    .browser-toolbar {
-      background: #c0c0c0;
-      border-bottom: 1px solid #808080;
-      padding: 4px;
-      font-size: 11px;
+    .sitemap ul {
+      list-style: none;
+      padding: 0;
+      max-width: 600px;
+      margin: 0 auto;
     }
-    .browser-content {
-      background: white;
-      border: 2px solid;
-      border-color: #808080 #ffffff #ffffff #808080;
-      padding: 4px;
-      min-height: 200px;
+    .sitemap li {
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
     }
-    .tree {
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      padding: 8px;
-      line-height: 1.6;
-    }
-    .tree-item {
-      padding: 2px 0;
-      color: #000080;
+    .sitemap a {
+      color: var(--primary);
       text-decoration: none;
     }
-    .tree-item:hover {
-      background: #000080;
-      color: white;
-    }
-    .tree-folder {
-      color: #808080;
-    }
-    .tree-line {
-      color: #808080;
+    .sitemap a:hover {
+      text-decoration: underline;
     }
     footer {
       text-align: center;
@@ -167,23 +128,13 @@
     </div>
   </section>
 
-  <section class="sites">
-    <div class="browser">
-      <div class="browser-titlebar">
-        <span>Directory Listing</span>
-        <div class="browser-buttons">
-          <span>_</span><span>□</span><span>×</span>
-        </div>
-      </div>
-      <div class="browser-toolbar">C:\RMS1000WATT\</div>
-      <div class="browser-content">
-        <div class="tree">
-          <span class="tree-folder">📁 <a href="./hello-world-tigerbeetle/" class="tree-item">hello-world-tigerbeetle/</a></span><br>
-          <span class="tree-folder">📁 <a href="./hello-world-pixijs/" class="tree-item">hello-world-pixijs/</a></span><br>
-          <span class="tree-folder">📁 <a href="./hello-world-stategraph/" class="tree-item">hello-world-stategraph/</a></span>
-        </div>
-      </div>
-    </div>
+  <section class="sitemap">
+    <h2>Site Map</h2>
+    <ul>
+      <li><a href="./hello-world-tigerbeetle/">hello-world-tigerbeetle/</a></li>
+      <li><a href="./hello-world-pixijs/">hello-world-pixijs/</a></li>
+      <li><a href="./hello-world-stategraph/">hello-world-stategraph/</a></li>
+    </ul>
   </section>
 
   <footer>
