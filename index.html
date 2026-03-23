@@ -75,57 +75,71 @@
       color: white;
       transform: translateY(-3px);
     }
-    .sites {
-      padding: 60px 20px;
+    .browser {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #808080 #808080 #ffffff;
+      padding: 2px;
     }
-    .sites h2 {
-      text-align: center;
-      font-size: 1.75rem;
-      font-weight: 600;
-      color: var(--dark);
-      margin-bottom: 40px;
+    .browser-titlebar {
+      background: linear-gradient(90deg, #000080, #1084d0);
+      color: white;
+      padding: 4px 6px;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .site-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 24px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    .site-card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      text-decoration: none;
-      color: inherit;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      transition: all 0.3s;
-      border: 1px solid #e2e8f0;
-    }
-    .site-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-      border-color: var(--primary);
-    }
-    .site-card h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--dark);
-      margin-bottom: 8px;
-    }
-    .site-card p {
-      font-size: 0.9rem;
-      color: #64748b;
-      margin: 0;
-    }
-    .site-card .arrow {
+    .browser-buttons span {
       display: inline-block;
-      margin-left: 8px;
-      color: var(--primary);
-      transition: transform 0.3s;
+      width: 16px;
+      height: 14px;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #808080 #808080 #ffffff;
+      text-align: center;
+      line-height: 12px;
+      font-size: 10px;
+      color: black;
+      margin-left: 2px;
+      cursor: pointer;
     }
-    .site-card:hover .arrow {
-      transform: translateX(4px);
+    .browser-toolbar {
+      background: #c0c0c0;
+      border-bottom: 1px solid #808080;
+      padding: 4px;
+      font-size: 11px;
+    }
+    .browser-content {
+      background: white;
+      border: 2px solid;
+      border-color: #808080 #ffffff #ffffff #808080;
+      padding: 4px;
+      min-height: 200px;
+    }
+    .tree {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      padding: 8px;
+      line-height: 1.6;
+    }
+    .tree-item {
+      padding: 2px 0;
+      color: #000080;
+      text-decoration: none;
+    }
+    .tree-item:hover {
+      background: #000080;
+      color: white;
+    }
+    .tree-folder {
+      color: #808080;
+    }
+    .tree-line {
+      color: #808080;
     }
     footer {
       text-align: center;
@@ -154,20 +168,21 @@
   </section>
 
   <section class="sites">
-    <h2>Projects</h2>
-    <div class="site-grid">
-      <a href="./hello-world-tigerbeetle/index.html" class="site-card">
-        <h3>Hello World TigerBeetle <span class="arrow">→</span></h3>
-        <p>A simple example using TigerBeetle</p>
-      </a>
-      <a href="./hello-world-pixijs/index.html" class="site-card">
-        <h3>Hello World PixiJS <span class="arrow">→</span></h3>
-        <p>A simple example using PixiJS</p>
-      </a>
-      <a href="./hello-world-stategraph/index.html" class="site-card">
-        <h3>Hello World StateGraph <span class="arrow">→</span></h3>
-        <p>A simple example using StateGraph</p>
-      </a>
+    <div class="browser">
+      <div class="browser-titlebar">
+        <span>Directory Listing</span>
+        <div class="browser-buttons">
+          <span>_</span><span>□</span><span>×</span>
+        </div>
+      </div>
+      <div class="browser-toolbar">C:\RMS1000WATT\</div>
+      <div class="browser-content">
+        <div class="tree">
+          <span class="tree-folder">📁 <a href="./hello-world-tigerbeetle/" class="tree-item">hello-world-tigerbeetle/</a></span><br>
+          <span class="tree-folder">📁 <a href="./hello-world-pixijs/" class="tree-item">hello-world-pixijs/</a></span><br>
+          <span class="tree-folder">📁 <a href="./hello-world-stategraph/" class="tree-item">hello-world-stategraph/</a></span>
+        </div>
+      </div>
     </div>
   </section>
 
