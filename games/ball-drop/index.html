@@ -87,6 +87,10 @@
     <h1>Ball Drop</h1>
     <div class="stats">
       <div>
+        <span class="stat-label">TIME</span>
+        <span class="stat" id="timer">0:00</span>
+      </div>
+      <div>
         <span class="stat-label">DEPTH</span>
         <span class="stat" id="depth">0</span>
       </div>
@@ -103,6 +107,7 @@
   </div>
   <div class="upgrades">
     <button class="btn" id="upgradeDurability" onclick="upgradeDurability()">+1 Durability (10)</button>
+    <button class="btn" id="resetBtn" onclick="manualReset()">Reset</button>
   </div>
   <div class="toast" id="toast"></div>
 
@@ -129,13 +134,20 @@
     let gameRunning = true;
     let currentDurability;
     let score = 0;
+    let startTime = Date.now();
+    
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return m + ':' + s.toString().padStart(2, '0');
+    }
     
     function loadState() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) return JSON.parse(saved);
       } catch (e) {}
-      return { coins: 0, maxDurability: 1, bestDepth: 0 };
+      return { coins: 0, maxDurability: 1, bestDepth: 0, totalTime: 0 };
     }
     
     function saveState() {
@@ -143,6 +155,7 @@
     }
     
     function updateDisplay() {
+      document.getElementById('timer').textContent = formatTime(state.totalTime + Math.floor((Date.now() - startTime) / 1000));
       document.getElementById('depth').textContent = Math.floor(score);
       document.getElementById('best').textContent = Math.floor(state.bestDepth);
       document.getElementById('durability').textContent = currentDurability + '/' + state.maxDurability;
@@ -162,7 +175,7 @@
     }
     
     function getUpgradeCost() {
-      return 10 * Math.pow(2, state.maxDurability - 1);
+      return 10 + (state.maxDurability - 1) * 10;
     }
     
     function upgradeDurability() {
@@ -208,6 +221,23 @@
     }
     
     function resetGame() {
+      if (score > state.bestDepth) {
+        state.bestDepth = score;
+        showToast(`New Best: ${Math.floor(state.bestDepth)}!`);
+      }
+      
+      state.coins += Math.floor(score / 10);
+      saveState();
+      
+      showToast(`Reset! +${Math.floor(score / 10)} coins`);
+      
+      initGame();
+    }
+    
+    function manualReset() {
+      state.totalTime += Math.floor((Date.now() - startTime) / 1000);
+      saveState();
+      
       if (score > state.bestDepth) {
         state.bestDepth = score;
         showToast(`New Best: ${Math.floor(state.bestDepth)}!`);
@@ -285,7 +315,9 @@
           if (currentDurability <= 0) {
             gameRunning = false;
             setTimeout(() => {
+              state.totalTime += Math.floor((Date.now() - startTime) / 1000);
               state.maxDurability++;
+              saveState();
               resetGame();
             }, 500);
           }
