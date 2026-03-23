@@ -155,7 +155,7 @@
     }
     
     function updateDisplay() {
-      document.getElementById('timer').textContent = formatTime(state.totalTime + Math.floor((Date.now() - startTime) / 1000));
+      document.getElementById('timer').textContent = formatTime((state.totalTime || 0) + Math.floor((Date.now() - startTime) / 1000));
       document.getElementById('depth').textContent = Math.floor(score);
       document.getElementById('best').textContent = Math.floor(state.bestDepth);
       document.getElementById('durability').textContent = currentDurability + '/' + state.maxDurability;
@@ -229,8 +229,6 @@
       state.coins += Math.floor(score / 10);
       saveState();
       
-      showToast(`Reset! +${Math.floor(score / 10)} coins`);
-      
       initGame();
     }
     
@@ -245,8 +243,6 @@
       
       state.coins += Math.floor(score / 10);
       saveState();
-      
-      showToast(`Reset! +${Math.floor(score / 10)} coins`);
       
       initGame();
     }
